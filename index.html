@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Display Contacts</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" integrity="sha384-b6lVK+yci+bfDmaY1u0zE8YYJt0TZxLEAFyYSLHId4xoVvsrQu3INevFKo+Xir8e" crossorigin="anonymous">
+
+<style>
+body {margin: 1.0em; 
+      font-size: 1.1em;  font-family: Arial, sans-serif;}
+.addressBook {font-size: 2.4em; font-weight: 600; margin-top: 0.3em; max-height: 999999px;}
+.btnDel, .btnEdit  {width: 3.0em;}
+.srchInput {margin-top: 1.0em; margin-right: 1.0em; padding: 0.3em;}
+.btnNew {margin-top: 1.0em; width: 12em;}
+.tblTop {margin-top: 1.0em;}
+</style>
+
+</head>
+<body>
+  <div id="root"></div>
+</body>
+<!-- This setup is not suitable for production. -->
+<!-- Only use it in development! -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script async src="https://ga.jspm.io/npm:es-module-shims@1.7.0/dist/es-module-shims.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react?dev",
+    "react-dom/client": "https://esm.sh/react-dom/client?dev"
+  }
+}
+</script>
+<script type="text/babel" data-type="module">
+import React, { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+
+import { useState } from 'react';
+
+function FilterableContactTable({ contacts }) {
+  const [filterFirst, SetFilterFirst] = useState('');
+  const [filterLast, SetFilterLast]   = useState('');
+  const [filterCity, SetFilterCity]   = useState('');
+
+  return (
+    <div>
+      <SearchBar 
+        filterFirst={filterFirst} 
+        filterLast={filterLast} 
+        filterCity={filterCity}
+        onFilterFirstChange={SetFilterFirst} 
+        onFilterLastChange={SetFilterLast}
+        onFilterCityChange={SetFilterCity} />
+      <ContactTable 
+        contacts={contacts} 
+        filterFirst={filterFirst}
+        filterLast={filterLast} 
+        filterCity={filterCity} />
+    </div>
+  );
+}
+
+function ContactRow({ contact }) {
+    
+  function hndlEdit() {
+    editByID(contact.id);
+  }
+  function hndlDelete() {
+    deleteByID(contact.id);
+  }
+    
+  return (
+    <tr>
+        <td><button onClick={() => hndlEdit()}  className="btn btn-warning btnEdit"><i className="bi bi-pen"></i></button></td>
+        <td>{contact.first}</td>
+        <td>{contact.middle}</td>
+        <td>{contact.last}</td>
+        <td>{contact.email}</td>
+        <td>{contact.phone}</td>
+        <td>{contact.address}</td>
+        <td>{contact.city}</td>
+        <td>{contact.state}</td>
+        <td>{contact.company}</td>
+        <td>{contact.ts}</td>
+        <td><button onClick={() => hndlDelete()}  className="btn btn-danger btnDel">X</button></td>
+    </tr>
+  );
+}
+
+function ContactTable({ contacts, filterFirst, filterLast, filterCity }) {
+  const rows = [];
+ 
+  contacts.forEach((contact) => {
+    if (
+        contact.first.toLowerCase().indexOf(
+        filterFirst.toLowerCase()
+      ) === -1
+    ) {
+      return;
+    }
+    
+    if (
+        contact.last.toLowerCase().indexOf(
+        filterLast.toLowerCase()
+      ) === -1
+    ) {
+      return;
+    }
+    
+    if (
+        contact.city.toLowerCase().indexOf(
+        filterCity.toLowerCase()
+      ) === -1
+    ) {
+      return;
+    }
+    
+    rows.push(
+      <ContactRow
+        contact={contact}
+        key={contact.id} />
+    );
+ 
+  });
+
+  return (
+    <div className="container-fluid tblTop">
+    <div className="table-responsive text-nowrap">
+    <table className="table table-striped">
+      <thead>
+        <tr>
+            <th>EDIT</th>
+            <th>First</th>
+            <th>Middle</th>
+            <th>Last</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Address</th>
+            <th>City</th>
+            <th>State</th>
+            <th>Company</th>
+            <th>Date</th>
+            <th>DELETE</th>
+        </tr>
+      </thead>
+      <tbody>{rows}</tbody>
+    </table>
+        </div>
+        </div>
+  );
+}
+
+function SearchBar({
+  filterFirst,
+  filterLast,
+  filterCity,
+  onFilterFirstChange,
+  onFilterLastChange,
+  onFilterCityChange
+}) {
+  return (   
+    <form>
+      <div className="container">
+        <div className="row">  
+            <div className="col-12 col-md-4 offset-md-2 text-center addressBook">
+               Address Book
+            </div>
+            <div className="col-12 col-md-2 text-center ">
+               <a href="contacts-new.html" className="btn btn-lg btn-success btnNew">Add Contact</a>
+           </div>
+        </div>   
+        <br />
+        <div className="row">
+            <div className="col-12 col-md-3 text-center ">
+                <input 
+                  className="srchInput"
+                  type="text" 
+                  value={filterFirst} 
+                  placeholder="Search First..." 
+                  onChange={(e) => onFilterFirstChange(e.target.value)} />
+            </div>
+            <div className="col-12 col-md-3 text-center ">
+                <input 
+                 className="srchInput"
+                 type="text" 
+                 value={filterLast} 
+                 placeholder="Search Last..." 
+                 onChange={(e) => onFilterLastChange(e.target.value)} />
+            </div>
+            <div className="col-12 col-md-3 text-center ">
+                <input 
+                 className="srchInput"
+                 type="text" 
+                 value={filterCity} 
+                 placeholder="Search City..." 
+                 onChange={(e) => onFilterCityChange(e.target.value)} />
+            </div>
+            
+        </div>
+        </div>
+    </form>
+  );
+}
+
+//get current local storage
+var theData = JSON.parse(localStorage.getItem("contacts_local") || "[]");
+
+let App = function App() {
+  return <FilterableContactTable contacts={theData} />;
+}
+
+const root = createRoot(document.getElementById('root'));
+root.render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+
+
+function deleteByID(id) {
+    for(let a in theData) {
+        if( theData[a].id  == id) {
+            delete theData[a];
+            break;
+        }
+    }
+    
+    // remove nulls from array
+    let theNewData = theData.filter(function (el) {
+        return el != null;
+    });
+    
+    localStorage.setItem("contacts_local", JSON.stringify(theNewData));
+    // refresh page to load new data
+    location.reload();
+}
+
+function editByID(id) {
+    let theIndex = false;
+    
+    for(let i in theData) {
+        if( theData[i].id  == id) {
+            theIndex = i;
+            break;
+        }
+    }
+    
+    if( theIndex === false ){
+        console.log('id not found: ' + id);
+        return;
+    }
+    // need to pass the index to edit page
+    let index = '{"index":"' + theIndex + '"}';
+    localStorage.setItem("contacts_local_edit_index", index);
+    location.href = 'contacts-edit.html';
+}
+</script>
+
+</html>

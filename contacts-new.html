@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Contact</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <style>
+    body {margin-top: 1.0em; margin-bottom: 4.0em; 
+          font-size: 1.1em;  font-family: Arial, sans-serif;}
+    .theTitle {font-size: 1.1em; font-weight: 500; margin-bottom: 1.0em; max-height: 999999px;}
+    input { margin: 0.3em; padding: 0.3em; width: 100%; }
+    .btnSub {width: 9.0em; margin-top: 1.0em;}
+    .btnCan {width: 9.0em; margin-top: 1.0em;}
+    .theLabel {margin-top: 0.5em; padding: 0.3em; max-height: 999999px;}
+    .labelReq {background-color: #f2f2f2;  border-radius: 0.5em;}
+    .labelOpt {background-color: #ffffff;}
+    .theBtns{ margin-top: 1.5em; }
+    .newContact {font-size: 1.8em; font-weight: 600;}
+    </style>
+
+</head>
+<body>
+  <div id="root"></div>
+</body>
+<!-- This setup is not suitable for production. -->
+<!-- Only use it in development! -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script async src="https://ga.jspm.io/npm:es-module-shims@1.7.0/dist/es-module-shims.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react?dev",
+    "react-dom/client": "https://esm.sh/react-dom/client?dev"
+  }
+}
+</script>
+<script type="text/babel" data-type="module">
+import React, { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { useState } from 'react';
+
+let App = function MyForm() {
+    
+    const [firstName, setFirstName]   = useState('');
+    const [middleName, setMiddleName] = useState('');
+    const [lastName, setLastName]     = useState('');
+    const [theEmail, setTheEmail]     = useState('');
+    const [thePhone, setThePhone]     = useState('');
+    const [theAddr, setTheAddr]       = useState('');
+    const [theCity, setTheCity]       = useState('');
+    const [theState, setTheState]     = useState('');
+    const [theCompany, setTheCompany] = useState('');
+
+  const hndlFirstName = event => {
+    const result = event.target.value.replace(/[^a-z\'\- ]/gi, '');
+    setFirstName(result);
+  };
+  const hndlMiddleName = event => {
+    const result = event.target.value.replace(/[^a-z\'\- ]/gi, '');
+    setMiddleName(result);
+  };
+  const hndlLastName = event => {
+    const result = event.target.value.replace(/[^a-z\'\- ]/gi, '');
+    setLastName(result);
+  };
+  const hndlEmail = event => {
+    const result = event.target.value.replace(/[^a-z0-9\-\.@_]/gi, '');
+    setTheEmail(result);
+  };
+  const hndlPhone = event => {
+    const result = event.target.value.replace(/[^0-9\-\.]/g, '');
+    setThePhone(result);
+  };
+  const hndlAddr = event => {
+    const result = event.target.value.replace(/[^a-z0-9\-\.#]/gi, '');
+    setTheAddr(result);
+  };
+  const hndlCity = event => {
+    const result = event.target.value.replace(/[^a-z\'\. ]/gi, '');
+    setTheCity(result);
+  };
+  const hndlState = event => {
+    const result = event.target.value.replace(/[^a-z]/gi, '');
+    setTheState(result);
+  };
+  const hndlCompany = event => {
+    const result = event.target.value.replace(/[^0-9a-z \.]/gi, '');
+    setTheCompany(result);
+  };
+     
+  function handleSubmit(e) {
+    // Prevent the browser from reloading the page
+    e.preventDefault();
+
+    // Read the form data
+    const form = e.target;
+    const formData = new FormData(form);
+
+    const formJson = Object.fromEntries(formData.entries());
+    
+    //get current local storage
+    let contacts = JSON.parse(localStorage.getItem("contacts_local") || "[]");
+    let contact_id = Math.floor(Math.random() * 1000000);
+    formJson.id = contact_id;
+    
+    let contact_ts = formatDate( new Date() );
+    formJson.ts = contact_ts;
+    
+    //console.log(formJson);
+    
+    contacts.push(formJson);
+    localStorage.setItem("contacts_local", JSON.stringify(contacts));
+  
+    alert('Entry Saved!');
+    
+    // clear inputs
+    setFirstName('');
+    setMiddleName('');
+    setLastName('');
+    setTheEmail('');
+    setThePhone('');
+    setTheAddr('');
+    setTheCity('');
+    setTheState('');
+    setTheCompany('');
+    
+    document.getElementById('firstName').focus();
+  }
+
+  return (
+          
+    <form method="post" onSubmit={handleSubmit}>
+    
+    <div className="container">
+    
+        <div className="row">  
+            <div className="col-12 text-center theTitle">
+               <span className="newContact">Add Contact</span>
+               <br />enter data, click "Save" 
+               <br />click "To Book" to view address book
+               <br />star (*) is required input
+            </div>
+        </div>
+
+        <div className="row">  
+            <div className="col-12 col-md-4">
+                <div className="row">  
+                  <div className="col-6 offset-3 offset-md-9 text-center text-md-end theLabel labelReq"> *First Name: </div>
+               </div>
+            </div>
+            <div className="col-10 offset-1 col-md-4 text-center text-md-start">          
+               <input autoFocus  
+                    id="firstName" 
+                    name="first"  
+                    type="text"
+                    title="Max length 40 chars."
+                    maxLength="40"
+                    value={firstName}
+                    onChange={hndlFirstName}
+                    required />
+            </div>
+        </div>
+   
+        <div className="row">  
+            <div className="col-12 col-md-4">
+                <div className="row">  
+                  <div className="col-6 offset-3 offset-md-9 text-center text-md-end theLabel labelOpt"> Middle Name: </div>
+               </div>
+            </div>
+            <div className="col-10 offset-1 col-md-4 text-center text-md-start">
+                <input name="middle"  
+                title="Max length 40 chars."
+                maxLength="40"
+                type="text"
+                value={middleName}
+                onChange={hndlMiddleName}
+               />
+            </div>
+        </div>
+   
+        <div className="row">  
+            <div className="col-12 col-md-4">
+                <div className="row">  
+                  <div className="col-6 offset-3 offset-md-9 text-center text-md-end theLabel labelReq"> *Last Name: </div>
+               </div>
+            </div>
+            <div className="col-10 offset-1 col-md-4 text-center text-md-start">
+                <input name="last" 
+                title="Max length 40 chars."
+                maxLength="40"
+                type="text"
+                value={lastName}
+                onChange={hndlLastName}
+               required />
+            </div>
+        </div>
+        
+        <div className="row">  
+            <div className="col-12 col-md-4">
+                <div className="row">  
+                  <div className="col-6 offset-3 offset-md-9 text-center text-md-end theLabel labelReq"> *Email: </div>
+               </div>
+            </div>
+            <div className="col-10 offset-1 col-md-4 text-center text-md-start">
+               <input name="email" 
+                type="email"
+                title="Max length 40 chars."
+                maxLength="40"
+                value={theEmail}
+                onChange={hndlEmail}
+               required />
+            </div>
+        </div>
+        
+        <div className="row">  
+            <div className="col-12 col-md-4">
+                <div className="row">  
+                  <div className="col-6 offset-3 offset-md-9 text-center text-md-end theLabel labelReq"> *Phone: </div>
+               </div>
+            </div>
+            <div className="col-10 offset-1 col-md-4 text-center text-md-start">
+               <input 
+                name="phone" 
+                type="tel"
+                title="Max length 12 chars."
+                maxLength="12"
+                value={thePhone}
+                onChange={hndlPhone}
+               required />
+            </div>
+        </div>
+        
+        <div className="row">  
+            <div className="col-12 col-md-4">
+                <div className="row">  
+                  <div className="col-6 offset-3 offset-md-9 text-center text-md-end theLabel labelOpt">Home Address: </div>
+               </div>
+            </div>
+            <div className="col-10 offset-1 col-md-4 text-center text-md-start">
+               <input 
+                name="address"
+                type="text"
+                title="Max length 40 chars."
+                maxLength="40"
+                value={theAddr}
+                onChange={hndlAddr}
+               />
+            </div>
+        </div>
+        
+        <div className="row">  
+            <div className="col-12 col-md-4">
+                <div className="row">  
+                  <div className="col-6 offset-3 offset-md-9 text-center text-md-end theLabel labelReq"> *City: </div>
+               </div>
+            </div>
+            <div className="col-10 offset-1 col-md-4 text-center text-md-start">
+               <input 
+               name="city"
+               type="text"
+               title="Max length 30 chars."
+               maxLength="30"
+               value={theCity}
+               onChange={hndlCity}
+               required />
+            </div>
+        </div>
+        
+        <div className="row">  
+            <div className="col-12 col-md-4">
+                <div className="row">  
+                  <div className="col-6 offset-3 offset-md-9 text-center text-md-end theLabel labelReq"> *State: </div>
+               </div>
+            </div>
+            <div className="col-10 offset-1 col-md-4 text-center text-md-start">
+               <input 
+                name="state"
+                type="text"
+                title="Max length 20 chars."
+                maxLength="20"
+                value={theState}
+                onChange={hndlState}
+                required />
+            </div>
+        </div>
+        
+        <div className="row">  
+            <div className="col-12 col-md-4">
+                <div className="row">  
+                  <div className="col-6 offset-3 offset-md-9 text-center text-md-end theLabel labelOpt"> Company: </div>
+               </div>
+            </div>
+            <div className="col-10 offset-1 col-md-4 text-center text-md-start">
+               <input 
+               name="company" 
+               type="text"
+               value={theCompany}
+               onChange={hndlCompany}
+               />
+            </div>
+        </div>
+   
+    </div>
+    
+    <div className="container theBtns">
+        <div className="row">
+         <div className="col-12 col-md-4 offset-md-2 text-center text-md-end">
+            <button className="btn btn-lg btn-success btnSub" type="submit">Save</button>
+        </div>
+         <div className="col-12 col-md-4 text-center text-md-start">
+            <a href="./" className="btn btn-lg btn-warning btnCan">To Book</a>
+        </div>
+        </div>
+    </div>
+    
+    </form>
+  );
+};
+
+
+const root = createRoot(document.getElementById('root'));
+root.render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+
+function dateComponentPad(value) {
+  let format = String(value);
+  return format.length < 2 ? '0' + format : format;
+}
+
+function formatDate(date) {
+  let datePart = [ date.getFullYear(), date.getMonth() + 1, date.getDate() ].map(dateComponentPad);
+  let timePart = [ date.getHours(), date.getMinutes(), date.getSeconds() ].map(dateComponentPad);
+
+  return datePart.join('-') + ' ' + timePart.join(':');
+}
+
+</script>
+
+</html>

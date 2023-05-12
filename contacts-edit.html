@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Contact</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <style>
+    body {margin-top: 1.0em; margin-bottom: 4.0em; 
+          font-size: 1.1em;  font-family: Arial, sans-serif;}
+    .theTitle {font-size: 1.1em; font-weight: 500; margin-bottom: 1.0em; max-height: 999999px;}
+    input { margin: 0.3em; padding: 0.3em; width: 100%; }
+    .btnSub {width: 9.0em; margin-top: 1.0em;}
+    .btnCan {width: 9.0em; margin-top: 1.0em;}
+    .theLabel {margin-top: 0.5em; padding: 0.3em; max-height: 999999px;}
+    .labelReq {background-color: #f2f2f2;  border-radius: 0.5em;}
+    .labelOpt {background-color: #ffffff;}
+    .theBtns{ margin-top: 1.5em; }
+    .editContact {font-size: 1.8em; font-weight: 600;}
+ </style>
+</head>
+<body>
+  <div id="root"></div>
+</body>
+<!-- This setup is not suitable for production. -->
+<!-- Only use it in development! -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script async src="https://ga.jspm.io/npm:es-module-shims@1.7.0/dist/es-module-shims.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react?dev",
+    "react-dom/client": "https://esm.sh/react-dom/client?dev"
+  }
+}
+</script>
+<script type="text/babel" data-type="module">
+import React, { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+
+import { useState } from 'react';
+
+//get current local storage
+var theData =  JSON.parse(localStorage.getItem("contacts_local") || "[]");
+let theIndex= JSON.parse(localStorage.getItem("contacts_local_edit_index") || "[]");
+
+let RowData = theData[ theIndex.index ];
+
+let App = function MyForm() {
+    
+  const [firstName, setFirstName]   = useState(RowData.first);
+  const [middleName, setMiddleName] = useState(RowData.middle);
+  const [lastName, setLastName]     = useState(RowData.last);
+  const [theEmail, setTheEmail]     = useState(RowData.email);
+  const [thePhone, setThePhone]     = useState(RowData.phone);
+  const [theAddress, setTheAddress] = useState(RowData.address);
+  const [theCity, setTheCity]       = useState(RowData.city);
+  const [theState, setTheState]     = useState(RowData.state);
+  const [theCompany, setTheCompany] = useState(RowData.company);
+  
+  
+  const hndlFirstName = event => {
+    const result = event.target.value.replace(/[^a-z\'\- ]/gi, '');
+    setFirstName(result);
+  };
+  const hndlMiddleName = event => {
+    const result = event.target.value.replace(/[^a-z\'\- ]/gi, '');
+    setMiddleName(result);
+  };
+  const hndlLastName = event => {
+    const result = event.target.value.replace(/[^a-z\'\- ]/gi, '');
+    setLastName(result);
+  };
+  const hndlEmail = event => {
+    const result = event.target.value.replace(/[^a-z0-9\-\.@_]/gi, '');
+    setTheEmail(result);
+  };
+  const hndlPhone = event => {
+    const result = event.target.value.replace(/[^0-9\-\.]/g, '');
+    setThePhone(result);
+  };
+  const hndlAddr = event => {
+    const result = event.target.value.replace(/[^a-z0-9\-\.#]/gi, '');
+    setTheAddr(result);
+  };
+  const hndlCity = event => {
+    const result = event.target.value.replace(/[^a-z\'\. ]/gi, '');
+    setTheCity(result);
+  };
+  const hndlState = event => {
+    const result = event.target.value.replace(/[^a-z]/gi, '');
+    setTheState(result);
+  };
+  const hndlCompany = event => {
+    const result = event.target.value.replace(/[^0-9a-z \.]/gi, '');
+    setTheCompany(result);
+  };
+    
+  function handleSubmit(e) {
+    // Prevent the browser from reloading the page
+    e.preventDefault();
+
+    // Read the form data
+    const form = e.target;
+    const formData = new FormData(form);
+
+    const formJson = Object.fromEntries(formData.entries());
+    let contact_id = Math.floor(Math.random() * 1000000);
+    formJson.id = contact_id;
+    let contact_ts = formatDate( new Date() );
+    formJson.ts = contact_ts;
+    
+    theData[theIndex.index] = formJson;
+    localStorage.setItem("contacts_local", JSON.stringify(theData));
+    
+    alert("Edit Saved!");
+    location.href = './';
+  }
+
+  return (
+    <form method="post" onSubmit={handleSubmit}>
+    
+    <div className="container">
+    
+        <div className="row">  
+            <div className="col-12 text-center theTitle">
+                <span className="editContact">Edit Contact</span>
+                <br /> click "Save" to save new data
+                <br />click "Cancel" to return to address book.
+            </div>
+        </div>
+
+        <div className="row">  
+            <div className="col-12 col-md-4">
+                <div className="row">  
+                  <div className="col-6 offset-3 offset-md-9 text-center text-md-end theLabel labelReq"> *First Name: </div>
+               </div>
+            </div>
+            <div className="col-10 offset-1 col-md-4 text-center text-md-start">
+               <input id="firstName" 
+               name="first" 
+               value={firstName} 
+               onChange={event => setFirstName(event.target.value)} 
+               required />
+            </div>
+        </div>
+   
+        <div className="row">  
+            <div className="col-12 col-md-4">
+                <div className="row">  
+                  <div className="col-6 offset-3 offset-md-9 text-center text-md-end theLabel"> Middle Name: </div>
+               </div>
+            </div>
+            <div className="col-10 offset-1 col-md-4 text-center text-md-start">
+               <input name="middle" 
+               value={middleName} 
+               onChange={event => setMiddleName(event.target.value)}  
+               />
+            </div>
+        </div>
+   
+        <div className="row">  
+            <div className="col-12 col-md-4">
+                <div className="row">  
+                  <div className="col-6 offset-3 offset-md-9 text-center text-md-end theLabel labelReq"> *Last Name: </div>
+               </div>
+            </div>
+            <div className="col-10 offset-1 col-md-4 text-center text-md-start">
+               <input name="last" 
+               value={lastName} 
+               onChange={event => setLastName(event.target.value)} 
+               required />
+            </div>
+        </div>
+        
+        <div className="row">  
+            <div className="col-12 col-md-4">
+                <div className="row">  
+                  <div className="col-6 offset-3 offset-md-9 text-center text-md-end theLabel labelReq"> *Email: </div>
+               </div>
+            </div>
+            <div className="col-10 offset-1 col-md-4 text-center text-md-start">
+               <input name="email" 
+               value={theEmail} 
+               onChange={event => setTheEmail(event.target.value)} 
+               required />
+            </div>
+        </div>
+        
+        <div className="row">  
+            <div className="col-12 col-md-4">
+                <div className="row">  
+                  <div className="col-6 offset-3 offset-md-9 text-center text-md-end theLabel labelReq"> *Phone: </div>
+               </div>
+            </div>
+            <div className="col-10 offset-1 col-md-4 text-center text-md-start">
+               <input name="phone" 
+               type="tel"
+               value={thePhone} 
+               onChange={event => setThePhone(event.target.value)} 
+               required />
+            </div>
+        </div>
+        
+        <div className="row">  
+            <div className="col-12 col-md-4">
+                <div className="row">  
+                  <div className="col-6 offset-3 offset-md-9 text-center text-md-end theLabel"> Home Address: </div>
+               </div>
+            </div>
+            <div className="col-10 offset-1 col-md-4 text-center text-md-start">
+               <input name="address" 
+               value={theAddress} 
+               onChange={event => setTheAddress(event.target.value)} 
+               />
+            </div>
+        </div>
+        
+        <div className="row">  
+            <div className="col-12 col-md-4">
+                <div className="row">  
+                  <div className="col-6 offset-3 offset-md-9 text-center text-md-end theLabel labelReq"> *City: </div>
+               </div>
+            </div>
+            <div className="col-10 offset-1 col-md-4 text-center text-md-start">
+               <input name="city" 
+               value={theCity} 
+               onChange={event => setTheCity(event.target.value)} 
+               required />
+            </div>
+        </div>
+        
+        <div className="row">  
+            <div className="col-12 col-md-4">
+                <div className="row">  
+                  <div className="col-6 offset-3 offset-md-9 text-center text-md-end theLabel labelReq"> *State: </div>
+               </div>
+            </div>
+            <div className="col-10 offset-1 col-md-4 text-center text-md-start">
+               <input name="state" 
+               value={theState} 
+               onChange={event => setTheState(event.target.value)} 
+               required />
+            </div>
+        </div>
+        
+        <div className="row">  
+            <div className="col-12 col-md-4">
+                <div className="row">  
+                  <div className="col-6 offset-3 offset-md-9 text-center text-md-end theLabel"> Company: </div>
+               </div>
+            </div>
+            <div className="col-10 offset-1 col-md-4 text-center text-md-start">
+               <input name="company" 
+               value={theCompany} 
+               onChange={event => setTheCompany(event.target.value)} 
+               />
+            </div>
+        </div>
+   
+    </div>
+    
+    <div className="container theBtns">
+        <div className="row">
+         <div className="col-12 col-md-4 offset-md-2 text-center text-md-end">
+            <button className="btn btn-lg btn-success btnSub" type="submit">Save</button>
+        </div>
+         <div className="col-12 col-md-4 text-center text-md-start">
+            <a href="./" className="btn btn-lg btn-danger btnCan">Cancel</a>
+        </div>
+        </div>
+    </div>
+    
+    </form>
+  );
+};
+
+
+const root = createRoot(document.getElementById('root'));
+root.render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+
+function dateComponentPad(value) {
+  let format = String(value);
+  return format.length < 2 ? '0' + format : format;
+}
+
+function formatDate(date) {
+  let datePart = [ date.getFullYear(), date.getMonth() + 1, date.getDate() ].map(dateComponentPad);
+  let timePart = [ date.getHours(), date.getMinutes(), date.getSeconds() ].map(dateComponentPad);
+
+  return datePart.join('-') + ' ' + timePart.join(':');
+}
+
+</script>
+
+</html>
